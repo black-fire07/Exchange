@@ -1,10 +1,11 @@
 pragma solidity ^0.8.0;
 
-contract Token {
-    string  public name = "DApp Token";
-    string  public symbol = "DAPP";
+contract Yuvan {
+    string  public name = "Yuvan";
+    string  public symbol = "YVN";
     uint256 public totalSupply = 1000000000000000000000000; // 1 million tokens
     uint8   public decimals = 18;
+    address public led;
 
     event Transfer(
         address indexed _from,
@@ -23,6 +24,11 @@ contract Token {
 
     constructor() {
         balanceOf[msg.sender] = totalSupply;
+        led = msg.sender;
+    }
+
+    function ad() public view returns(address) {
+        return led;
     }
 
     function transfer(address _to, uint256 _value) public returns (bool success) {
@@ -32,7 +38,6 @@ contract Token {
         emit Transfer(msg.sender, _to, _value);
         return true;
     }
-
     function approve(address _spender, uint256 _value) public returns (bool success) {
         allowance[msg.sender][_spender] = _value;
         emit Approval(msg.sender, _spender, _value);
