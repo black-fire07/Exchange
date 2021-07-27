@@ -11,15 +11,12 @@ class Main extends Component {
   }
 
   render() {
-    // console.log(this.props.yuvanBalance)
     let content
     if(this.state.currentForm === 'buy') {
       content = <BuyForm
         ethBalance={this.props.ethBalance}
         tokenBalance={this.props.tokenBalance}
-        yuvanBalance={this.props.yuvanBalance}
         buyTokens={this.props.buyTokens}
-        buyyuvan={this.props.buyyuvan}
       />
     } else {
       content = <SellForm

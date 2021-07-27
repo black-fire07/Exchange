@@ -11,9 +11,7 @@ class BuyForm extends Component {
   }
 
   render() {
-    console.log(this.props.yuvanBalance)
     return (
-      <>
       <form className="mb-3" onSubmit={(event) => {
           event.preventDefault()
           let etherAmount
@@ -68,36 +66,12 @@ class BuyForm extends Component {
             </div>
           </div>
         </div>
-        
         <div className="mb-5">
           <span className="float-left text-muted">Exchange Rate</span>
           <span className="float-right text-muted">1 ETH = 100 Token</span>
         </div>
         <button type="submit" className="btn btn-primary btn-block btn-lg">SWAP!</button>
       </form>
-      <form className="mb-3" onSubmit={(event) => {
-          event.preventDefault()
-          let amount
-          amount = this.input.value.toString()
-          amount = window.web3.utils.toWei(amount, 'Ether')
-          this.props.buyyuvan(amount)
-        }}>
-        <div>
-          <label className="float-left"><b>Yuvan</b></label>
-          <span className="float-right text-muted">
-            Balance: {window.web3.utils.fromWei(this.props.yuvanBalance, 'Ether')}
-          </span>
-        </div>
-        <input
-            type="text"
-            className="form-control form-control-lg"
-            placeholder="0"
-            value={this.state.output}
-            disabled
-          />
-          <button type="submit" className="btn btn-primary btn-block btn-lg">SWAP!</button>
-        </form>
-        </>
     );
   }
 }

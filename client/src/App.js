@@ -1,15 +1,9 @@
 import React, { Component } from 'react';
 import Web3 from 'web3';
 import Token from '../../build/contracts/Token.json'
-import Yuvan from '../../build/contracts/Yuvan.json'
-import Nft from '../../build/contracts/Nft.json'
-import Auction from '../../build/contracts/Auction.json'
 import EthSwap from '../../build/contracts/EthSwap.json'
 import Main from './Main'
 import './App.css';
-import Spotify from './Spotify'
-
-
 
 class App extends Component {
 
@@ -17,18 +11,12 @@ class App extends Component {
     super(props)
     this.state = {
       account: '',
-      nft:{},
       token: {},
-      yuvan:{},
       ethSwap: {},
-      auction: {},
-      yuvanBalance: '0',
       ethBalance: 0,
-      tokenBalance: 0,
+      tokenBalance: '0',
       loading: true,
-      address: '',
-      add:'',
-      highest:0
+      address: ''
     }
   }
 
@@ -36,13 +24,8 @@ class App extends Component {
     await this.loadWeb3()
     // console.log(window.web3);
     await this.loadBlockdata()
-    await this.spot();
   }
 
-  async spot(){
-    
-  }
-  
   async loadWeb3(){
     if(window.ethereum) {
       window.web3 = new Web3(window.ethereum)
@@ -65,29 +48,13 @@ class App extends Component {
     this.setState({ethBalance})
     // console.log(this.state.ethBalance)
     const networkId =  await web3.eth.net.getId()
-    const yuvanData = Yuvan.networks[networkId]
     const tokenData = Token.networks[networkId]
-    const nftData = Nft.networks[networkId]
-    const auctionData = Auction.networks[networkId]
-    console.log(tokenData.address)
     if(tokenData) {
       const token = new web3.eth.Contract(Token.abi, tokenData.address)
-      const yuvan = new web3.eth.Contract(Yuvan.abi, yuvanData.address)
-      const nft = new web3.eth.Contract(Nft.abi, nftData.address)
-      const auction = new web3.eth.Contract(Auction.abi, auctionData.address)
-      this.setState({add:auctionData.address})
-      this.setState({ yuvan })
-      this.setState({ nft })
       this.setState({ token })
-      this.setState({ auction })
-      let highest = await auction.methods.highestBid.call().call()
-      this.setState({ highest: window.web3.utils.fromWei(highest, 'Ether')})
-      // token.balanceOf.call("0xa40644BEE5907f06a43E6f97cDEd680c15Fc6824").thenthis.setState({tokenBalance: })
       let tokenBalance = await token.methods.balanceOf(this.state.account).call()
       this.setState({ tokenBalance: tokenBalance.toString() })
-      let yuvanBalance = await yuvan.methods.balanceOf(this.state.account).call()
-      this.setState({ yuvanBalance: yuvanBalance.toString() })
-      console.log(this.state.yuvanBalance)
+      // console.log(this.state.tokenBalance)
     } else {
       window.alert('Token contract not deployed to detected network.')
     }
@@ -109,16 +76,7 @@ class App extends Component {
       this.setState({ loading: false })
       this.loadBlockdata();
     })
-  }
 
-  buyyuvan = (amount) => {
-    this.setState({ loading: true })
-    this.state.token.methods.approve(this.state.address,amount).send({from: this.state.account}).on('transactionHash', (hash) => {
-      this.state.ethSwap.methods.exchange(amount).send({from: this.state.account}).on('transactionHash', (hash) => {
-        this.setState({ loading: false })
-        this.loadBlockdata();
-      })
-    })
   }
 
   sellTokens = (tokenAmount) => {
@@ -131,64 +89,18 @@ class App extends Component {
       })
     })
   }
-
-  makenft = (uri,id) => {
-    // this.setState({ loading: true })
-    this.state.nft.methods.mint(uri,id).send({from : this.state.account}).on('transactionHash', (hash) => {
-      // this.setState({ loading: false })
-      this.loadBlockdata();
-    })
-  }
   
-  start = () => {
-    this.state.auction.methods.start().send({from : this.state.account}).on('transactionHash', (hash) => {
-      this.loadBlockdata();
-    })
-  }
-
-  withdraw = () => {
-    this.state.auction.methods.withdraw().send({from : this.state.account}).on('transactionHash', (hash) => {
-      this.loadBlockdata();
-    })
-  }
-
-  bid = (val) => {
-    this.state.yuvan.methods.approve(this.state.add,val).send({from: this.state.account}).on('transactionHash', (hash) => {
-    this.state.auction.methods.bid(val).send({from : this.state.account}).on('transactionHash', (hash) => {
-      this.loadBlockdata();
-    })
-  })
-  }
-
-  auctionend = (val) => {
-   
-    // this.state.yuvan.methods.approve(this.state.add,amount).send({from: this.state.account}).on('transactionHash', (hash) => {
-    this.state.auction.methods.auctionEnd(val).send({from : this.state.account}).on('transactionHash', (hash) => {
-      this.loadBlockdata();
-    })
-  // })
-  }
 
   render() {
-    let content,spot
+    let content
     if(this.state.loading) {
       content = <p id="loader" className="text-center">Loading...</p>
     } else {
       content = <Main
         ethBalance={this.state.ethBalance}
         tokenBalance={this.state.tokenBalance}
-        yuvanBalance={this.state.yuvanBalance}
         buyTokens={this.buyTokens}
         sellTokens={this.sellTokens}
-        buyyuvan = {this.buyyuvan}
-      />
-      spot = <Spotify 
-        makenft = {this.makenft}
-        start = {this.start}
-        bid = {this.bid}
-        highest = {this.state.highest}
-        withdraw = {this.withdraw}
-        auctionend = {this.auctionend}
       />
     }
     return (
@@ -208,11 +120,9 @@ class App extends Component {
           <div className="row">
             <main role="main" className="col-lg-12 d-flex text-center">
               {content}
-              {spot}
             </main>
           </div>
         </div>
-        
       </div>
     );
   }
